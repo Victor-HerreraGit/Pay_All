@@ -28,6 +28,3 @@ class User:
         self.administrator = None
         self.payment_method = None
         self.bills = None
-user1 = User("jdoe", "password123", False, "credit_card", 50.0)
-user1.modify_account(bills=75.0)
-print(user1.bills)
