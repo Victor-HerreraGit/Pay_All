@@ -61,13 +61,13 @@ class Bill:
         if billing_account not in self.billing_accounts:
             print("Error: Billing account not found")
             return 
-            
+
         if self.payment_method is None:
             print("Error: No payment method available")
             return
 
         payment = {
-            "billing_account": billing_account,  # assume only one billing account for simplicity
+            "billing_account": billing_account,  
             "payment_method": self.payment_method,
             "payment_amount": amount,
             "payment_date": datetime.now().date()
