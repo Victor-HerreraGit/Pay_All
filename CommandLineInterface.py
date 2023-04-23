@@ -1,101 +1,96 @@
-from collections import deque
+from os.path import exists, getsize
+import pickle
+
+#local imports
+import Session
 
 class CommandLineInterface:
-
-    def __init__(self, histLen = 10):
-        
-        self.histLen = histLen
-        self.history = deque(maxlen = histLen) #user accessible to see previous commands
-        self.internalHistory = deque(maxlen = 100) #this is for debugging purposes
-        
-        self.kwExit = "exit"
-        self.kwHelp = "help"
-        self.kwLogout = "logout"
-        self.kwLogin = "login"
-        self.kwCreateAcct = "newacct"
-        self.kwHist = "history"
-        
-        self.prompt = ">"
-        self.welcome_msg = "Welcome to Pay All, the Bill centralizer!"
-        self.helpMsg = "Displays a help message showing available commands"
-        self.logoutMsg = "Signs-out the current user of the system"
-        self.unrecCmdMsg = " is an unrecognized keyword, type '" + self.kwHelp + "' if you need help"
-        
-        self.homescreenName = "syshome"
-        self.adminScreenName = "admin"
-        self.userHomeScreenName = "userhome"
-        self.billViewScreenName = "billview"
-        
-        #Syntax Map dict(key=ScreenName, val=dict(key = function names, val = list([args & description, function pointer])))
-        self.syn_map = dict()
-        
-        #map non-common homescreen commands
-        self.syn_map[self.homescreenName] = dict()
-        self.syn_map[self.homescreenName][self.kwExit] = ["Exits the program", None] #Special case
-        self.syn_map[self.homescreenName][self.kwLogin] = ["usage: '" + self.kwLogin + " username password', logs into the specified user's account", None] #FIXME: Add function
-        self.syn_map[self.homescreenName][self.kwCreateAcct] = ["usage '" + self.kwCreateAcct + " username password' creates a new account with username specified if one doesn't exist", None] #FIXME: Add function
-        
-        
-        self.syn_map[self.adminScreenName] = dict()
-        self.syn_map[self.userHomeScreenName] = dict()
-        self.syn_map[self.billViewScreenName] = dict()
-        
-        #help population
-        for keyScrn in self.syn_map:
-            self.syn_map[keyScrn][self.kwHelp] = [self.helpMsg, self.__help]
-            self.syn_map[keyScrn][self.kwHist] =["usage '" + self.kwHist + "' displays last 10 commands", self.__hist]
-            if keyScrn != self.homescreenName:
-                self.syn_map[keyScrn][self.kwLogout] = [self.logoutMsg, None] #FIXME: Add function
-            
-        self.curScreen = self.homescreenName
-
-    def __sanitize(self, string):
-        return string.lower()
-
-    def __help(self, args):
-        helpStr = ""
-        for key in self.syn_map[self.curScreen]:
-            helpStr +=  key + " -- " + self.syn_map[self.curScreen][key][0] + "\n"
-        self.display(helpStr)
-        
-    def __hist(self, args):
-        histStr = ""
-        for i in range(len(self.history)):
-            histStr += str(len(self.history) - i) + ": " + self.history[i] + "\n"
-        self.display(histStr)
+    sessions = [] #start with empty session list
+    users = dict() #user dict is {key='username', value=userObject}
     
-    def submitText(self, string):
-        return string
+    rootAcctName = 'root'
+    
+    #define static keywords and screen names
+    kwExit = "exit"
+    kwHelp = "help"
+    kwLogout = "logout"
+    kwLogin = "login"
+    kwCreateAcct = "newacct"
+    kwHist = "history"
+    
+    #Userhome specific
+    kwUserSummary = "show"
+    kwDelAcct = "deleteacct"
+    kwModAcct = "modacct"
+    
+    #Admin specific
+    kwPromoteAdmin = "promote"
+    kwAnnounce = "announce"
+    kwDelInactAcct = kwDelAcct
+    
+    prompt = ">"
+    welcomeMsg = "Welcome to Pay All, the Bill centralizer!"
+    helpMsg = "Displays a help message showing available commands"
+    logoutMsg = "Signs-out the current user of the system"
+    unrecCmdMsg = " is an unrecognized keyword, type '" + kwHelp + "' if you need help"
+    acctExistsMsg = "username is taken"
+    
+    homeScreenName = "syshome"
+    adminScreenName = "admin"
+    userHomeScreenName = "userhome"
+    billViewScreenName = "billview"
+    
+    def __init__(self):
+        pass
+    
+    def __addSession(self, session): #threadsafe eventually
+        ind = len(CommandLineInterface.sessions)
+        CommandLineInterface.sessions.append(session)
+        return ind
+    
+    def login(self, userName, password):
+        if userName in CommandLineInterface.users:
+            #if CommandLineInterface.users[userName].password == password: #FIXME: authenticate
+                return (True, CommandLineInterface.users[userName])
+        return (False, None)
+    
+    def createAccount(self, userName, password): #FIXME: threadsafe
+        if userName in CommandLineInterface.users:
+            return (False, None)
+        else:
+            #FIXME: call User create acct method
+            usr = None
+            CommandLineInterface.users[userName] = usr
+            return (True, usr)
 
-    def startSession(self):
-        self.display(self.welcome_msg)
+    def startSession(self, superUser = False): #superUser is root user spawning system
+        #create admin user if one doesn't exist
+        session = None
+        if superUser:
+            if CommandLineInterface.rootAcctName not in CommandLineInterface.users:
+                suprUsr = None #FIXME with actual user obj
+                CommandLineInterface.users[CommandLineInterface.rootAcctName] = suprUsr 
+            session = Session.CLISession(self, 0, rootSess = True, user = CommandLineInterface.users[CommandLineInterface.rootAcctName]) #FIXME add session ID logic
+        else:
+            pass
         
-        kw = ""
-        while kw != self.kwExit:
-            inp = input(self.prompt)
-            self.history.append(inp)
-            self.internalHistory.append(inp)
-            self.display(inp)
-            cmd = inp.split()
-            kw = self.__sanitize(cmd[0])
-            if len(cmd) > 1:
-                args = cmd[1:]
-            else:
-                args = []
-            if kw in self.syn_map[self.curScreen]:
-                if self.syn_map[self.curScreen][kw][1] != None: #check for keyword associated function
-                    #try: #except arg issues and notify user
-                    self.syn_map[self.curScreen][kw][1](args)
-            else:
-                self.display("'" + kw + "'" + self.unrecCmdMsg)
-
-    def display(self, string):
-        print(string)
+        self.__addSession(session)
+        
+        if superUser: #spawn root session
+            session.sessionLoop()
 
 if __name__ == "__main__":
-    #FIXME: add logging (or incl in main func)
-    cmd = CommandLineInterface()
-    try:
-        cmd.startSession()
-    finally:
-        pass #FIXME: Print history of commands to log file
+    if True: #FIXME: add case for an already running program using multiprocess manager
+        #FIXME: add logging (or incl in main func)
+        userFileName = 'savedusers.pkl'
+        if exists(userFileName) and getsize(userFileName) > 0:
+            f = open(userFileName, 'rb')
+            CommandLineInterface.users = pickle.load(f)
+            f.close()
+        cmd = CommandLineInterface()
+        try:
+            cmd.startSession(superUser=True) #FIXME: migrate to manager framework, requiring separate login
+        finally:
+            f = open(userFileName, 'wb')
+            pickle.dump(CommandLineInterface.users, f)
+            f.close()
