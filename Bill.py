@@ -1,4 +1,6 @@
 from PaymentMethod import PaymentMethod
+from User import User
+
 import datetime
 class Bill:
     def __init__(self, user, payment_method, amount):
@@ -7,7 +9,7 @@ class Bill:
         self.amount = amount
         self.billing_accounts = []
         self.payment_history = []
-        self.recurring_payments = {}
+        self.recurring_payments = []
         self.frequency = 30 
         # 30 days for recurring payments
 
@@ -30,9 +32,10 @@ class Bill:
                 route = input("Routing: ")
                 payment_method = self.payment_method.addPaymentMethod(name, type, expYear, num, code, route)
 
-            if reply == "N":
+            else:
+                print("Error: No Payment Method Found")
                 return
-
+            
         if billing_account not in self.billing_accounts:
             print("Error: Billing account not found")
             return 
@@ -51,7 +54,7 @@ class Bill:
         self.recurring_payments.append(recurring_payment)
         self.payment_history.append(recurring_payment)
 
-        print(f"Recurring payment set up for billing account: {self.recurring_payments['billing_account']}, payment method: {self.recurring_payments['payment_method']}, in the amount of: {self.recurring_payments['bill_amount']}. Your last payment was made on: {self.recurring_payments['last_payment_date']}.")
+        print(f"Recurring payment set up for billing account: {recurring_payment['billing_account']}, payment method: {recurring_payment['payment_method']}, in the amount of: {recurring_payment['bill_amount']}.")
 
 
     def linkBillingAccount(self):
@@ -99,3 +102,7 @@ class Bill:
         pass
 
 
+# Test
+user = User("Victor", "verification", False, "Fed Now", 50.0)
+bill = Bill(user, 100, "netflix")
+bill.setUpRecurringPayments(100, "netflix", "visa")
