@@ -33,3 +33,4 @@ class User:
 # Test
 user1 = User("Victor", "verification", False, "Fed Now", 50.0)
 print(f" User name: {user1.username},\n Current Password: {user1.password},\n current balance on bill: {user1.bills}")
+print("", user1.payment_method)
