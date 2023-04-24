@@ -57,8 +57,13 @@ class Bill:
         print(f"Recurring payment set up for billing account: {recurring_payment['billing_account']}, payment method: {recurring_payment['payment_method']}, in the amount of: {recurring_payment['bill_amount']}.")
 
 
-    def linkBillingAccount(self):
-        pass
+    def linkBillingAccount(self, billing_account):
+        if billing_account in self.billing_accounts:
+            print("Error: Billing account is already linked")
+            return
+        
+        self.billing_accounts.append(billing_account)
+        print(f"Billing account {billing_account} linked successfully")
 
     def deleteBillingAccount(self):
         pass
