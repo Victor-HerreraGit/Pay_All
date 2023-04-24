@@ -10,7 +10,7 @@ from collections import deque
 import sys
 
 #local imports
-import CommandLineInterface
+# from CommandLineInterface import CommandLineInterface
 
 class CLISession:
     def __init__(self, cli, sessID, rootSess = False, user = None, histLen = 10):
@@ -28,7 +28,7 @@ class CLISession:
         #map non-common homescreen commands
         self.syn_map[cli.homeScreenName] = dict()
         self.syn_map[cli.homeScreenName][cli.kwLogin] = ["usage: '" + cli.kwLogin + " username password', logs into the specified user's account", self.login]
-        self.syn_map[cli.homeScreenName][cli.kwCreateAcct] = ["usage '" + cli.kwCreateAcct + " username password' creates a new account with username specified if one doesn't exist", None] #FIXME: Add function
+        self.syn_map[cli.homeScreenName][cli.kwCreateAcct] = ["usage '" + cli.kwCreateAcct + " username password' creates a new account with username specified if one doesn't exist", self.createAccount] #FIXME: Add function
         
         self.syn_map[cli.adminScreenName] = dict()
         
@@ -43,7 +43,7 @@ class CLISession:
             self.syn_map[keyScrn][cli.kwHist] = ["usage '" + cli.kwHist + "' displays last 10 commands", self.__hist]
             self.syn_map[keyScrn][cli.kwExit] = ["Exits the program", None] #Special case #FIXME: add logout and exit methods
             if keyScrn != cli.homeScreenName:
-                self.syn_map[keyScrn][cli.kwLogout] = [cli.logoutMsg, None] #FIXME: Add function
+                self.syn_map[keyScrn][cli.kwLogout] = [cli.logoutMsg, self.logout] #FIXME: Add function
         
         self.curScreen = cli.homeScreenName
     
@@ -74,12 +74,28 @@ class CLISession:
         #FIXME multiprocess query for user
         success, usr = self.cli.login(user, password)
         if success:
+            self.user = usr
             self.curScreen = self.cli.userHomeScreenName
+            self.display(self.cli.loginOkMsg)
             #admin
             #if self.user != None and self.user.isAdmin(): #FIXME
             if True: #FIXME hardcoded admin
                 #populate admin commands
                 pass
+        else:
+            self.display(self.cli.loginBadMsg)
+            
+    def createAccount(self, user, password):
+        success, usr = self.cli.createAccount(user, password)
+        if success:
+            self.user = usr
+            self.display(self.cli.acctCreateOkMsg)
+        else:
+            self.display(self.cli.acctExistsMsg)
+    
+    def logout(self):
+        self.curScreen = self.cli.homeScreenName
+        self.user = None
     
     def sessionLoop(self):
         kw = ""
@@ -89,18 +105,20 @@ class CLISession:
             self.internalHistory.append(inp)
             self.display(inp)
             cmd = inp.split()
-            kw = self.__sanitize(cmd[0])
-            if len(cmd) > 1:
-                args = cmd[1:]
-            else:
-                args = []
-            if kw in self.syn_map[self.curScreen]:
-                if self.syn_map[self.curScreen][kw][1] != None: #check for keyword associated function
-                    #try: #except arg issues and notify user
-                    try:
-                        self.syn_map[self.curScreen][kw][1](*args)
-                    except TypeError as e:
-                        self.display("Args error")
-                        self.display(e)
-            else:
-                self.display("'" + kw + "'" + self.cli.unrecCmdMsg)
+            if len(cmd) > 0:
+                kw = self.__sanitize(cmd[0])
+                if len(cmd) > 1:
+                    args = cmd[1:]
+                else:
+                    args = []
+                if kw in self.syn_map[self.curScreen]:
+                    if self.syn_map[self.curScreen][kw][1] != None: #check for keyword associated function
+                        #try: #except arg issues and notify user
+                        try: #pass
+                            self.display("Executing '" + kw + "' with args " + str(args))
+                            self.syn_map[self.curScreen][kw][1](*args)
+                        except TypeError as e:
+                            self.display("Args error")
+                            self.display(e)
+                else:
+                    self.display("'" + kw + "'" + self.cli.unrecCmdMsg)
