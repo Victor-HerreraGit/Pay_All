@@ -7,7 +7,7 @@ from Bill import Bill
 class TestUser(unittest.TestCase):
 
     def setUp(self):
-        self.user = User("Victor", "password123", False, "credit card", [])
+        self.user = User("Victor", "password123", False, "credit card", [])  #
 
     def test_create_account(self):
         self.user.create_account("Victor", "newpassword456")
@@ -19,7 +19,7 @@ class TestUser(unittest.TestCase):
             self.user.create_account('username', None)
 
     def test_modify_account(self):
-        self.user.modify_account(None,None,None,None,None)
+        self.user.modify_account(None, None, None, None, None)
         self.user.modify_account(administrator=True, payment_method="paypal")
         self.assertTrue(self.user.administrator)
         self.assertEqual(self.user.payment_method, "paypal")
