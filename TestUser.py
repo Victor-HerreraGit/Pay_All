@@ -7,7 +7,7 @@ from Bill import Bill
 class TestUser(unittest.TestCase):
 
     def setUp(self):
-        self.user = User("Victor", "password123", False, "credit card", [])
+        self.user = User("Victor", "password123", False, "credit card", [])  #
 
     def test_create_account(self):
         self.user.create_account("Victor", "newpassword456")
