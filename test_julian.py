@@ -6,7 +6,7 @@ import datetime
 import unittest
 from unittest.mock import patch
 
-from main import RegUsr, admin, listAccountsRegUsr
+from admin import RegUsr, admin, listAccountsRegUsr
 
 # Create three dummy lastLogin dates in the past (Boundary Test Cases)
 lastLogin1 = datetime.datetime.now() - datetime.timedelta(days=89)
