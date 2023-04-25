@@ -7,8 +7,12 @@ class User:
         self.bills = bills
 
     def create_account(self, username, password):
+        if username is None or password is None:
+            raise ValueError("Username and password cannot be None.")
+            return
         self.username = username
         self.password = password
+        print("Account Created")
 
     def modify_account(self, username=None, password=None, administrator=None, payment_method=None, bills=None):
         if username:
@@ -31,6 +35,8 @@ class User:
 
 
 # Test
-user1 = User("Victor", "verification", False, "Fed Now", 50.0)
-print(f" User name: {user1.username},\n Current Password: {user1.password},\n current balance on bill: {user1.bills}")
-print("", user1.payment_method)
+user1 = User('Victor', "verification", False, "Fed Now", 50.0)
+user1.modify_account(None,None,None,None,None)
+print(user1.username)
+# print(f" User name: {user1.username},\n Current Password: {user1.password},\n current balance on bill: {user1.bills}")
+# print("", user1.payment_method)
