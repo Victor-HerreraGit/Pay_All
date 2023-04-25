@@ -1,5 +1,4 @@
 import datetime
-from py2cfg import cfg_from_method
 
 class RegUsr:
     def __init__(self, usrName, passWrd):
