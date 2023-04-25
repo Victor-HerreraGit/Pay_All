@@ -1,5 +1,5 @@
 import datetime
-
+from py2cfg import cfg_from_method
 
 class RegUsr:
     def __init__(self, usrName, passWrd):
@@ -22,6 +22,7 @@ listAccountsRegUsr = [
 
 class admin:
     def __init__(self, usrName, passWrd):
+
         self.usrName = usrName
         self.passWrd = passWrd
         self.lastLogin = None
@@ -108,5 +109,3 @@ print("\nTest Case 6 for announce method")
 # Test Case 6: Message length more than 50 characters
 admin1.announce("A message with more than 50asdfafasdfasgasdgakjsdgkjhgjkahgkjhakghajksdgha")
 
-
-# End
