@@ -30,10 +30,12 @@ class CLISession:
         self.syn_map[cli.homeScreenName][cli.kwLogin] = ["usage: '" + cli.kwLogin + " username password', logs into the specified user's account", self.login]
         self.syn_map[cli.homeScreenName][cli.kwCreateAcct] = ["usage '" + cli.kwCreateAcct + " username password' creates a new account with username specified if one doesn't exist", self.createAccount] #FIXME: Add function
         
-        self.syn_map[cli.adminScreenName] = dict()
+        #self.syn_map[cli.adminScreenName] = dict()
         
         self.syn_map[cli.userHomeScreenName] = dict()
-        # self.syn_map[self.userHomeScreenName][cli.kwLogin] = 
+        self.syn_map[cli.userHomeScreenName][cli.kwUserSummary] = ["", self.showUser] #FIXME: need User to_string()
+        self.syn_map[cli.userHomeScreenName][cli.kwDelAcct] = ["usage '" + cli.kwDelAcct + "' deletes the currently logged in account", self.deleteAccount]
+        #self.syn_map[self.userHomeScreenName][cli.kwModAcct] = 
         
         self.syn_map[cli.billViewScreenName] = dict()
         
@@ -45,8 +47,13 @@ class CLISession:
             if keyScrn != cli.homeScreenName:
                 self.syn_map[keyScrn][cli.kwLogout] = [cli.logoutMsg, self.logout] #FIXME: Add function
         
-        self.curScreen = cli.homeScreenName
-    
+        if user == None:
+            self.curScreen = cli.homeScreenName
+        else:
+            self.curScreen = cli.userHomeScreenName
+            if user.administrator != None and user.administrator:
+                self.__adminCmds(user.administrator)
+        
     def __sanitize(self, string):
         return string.lower()
 
@@ -62,6 +69,24 @@ class CLISession:
         for i in range(len(self.history)):
             histStr += str(len(self.history) - i) + ": " + self.history[i] + "\n"
         self.display(histStr)
+    
+    def __adminCmds(self, add = False):
+        if add:
+            # change delete account behavior to be able to delete any account
+            #self.syn_map[self.userHomeScreenName][cli.kwDelAcct]
+            self.syn_map[self.cli.userHomeScreenName][self.cli.kwUsrList] = ["", self.listUsers]
+            self.syn_map[self.cli.userHomeScreenName][self.cli.kwOtherUsrSummary] = ["", self.showUser]
+        else:
+            self.syn_map[self.cli.userHomeScreenName].pop(self.cli.kwUsrList, None)
+            self.syn_map[self.cli.userHomeScreenName].pop(self.cli.kwOtherUsrSummary, None)
+    
+    def listUsers(self):
+        self.display(str(self.cli.users.keys()))
+    
+    def showUser(self, usr = None):
+        if usr == None:
+            usr = self.user.username
+        print(usr + ": " + str(self.cli.users[usr]))
     
     def getSessionID(self):
         return self.__sessionID
@@ -79,23 +104,32 @@ class CLISession:
             self.display(self.cli.loginOkMsg)
             #admin
             #if self.user != None and self.user.isAdmin(): #FIXME
-            if True: #FIXME hardcoded admin
+            if usr.administrator != None and usr.administrator: #FIXME hardcoded admin
                 #populate admin commands
-                pass
+                self.__adminCmds(usr.administrator)
         else:
             self.display(self.cli.loginBadMsg)
             
     def createAccount(self, user, password):
         success, usr = self.cli.createAccount(user, password)
         if success:
-            self.user = usr
             self.display(self.cli.acctCreateOkMsg)
+            self.login(user, password)
         else:
             self.display(self.cli.acctExistsMsg)
     
     def logout(self):
         self.curScreen = self.cli.homeScreenName
+        if self.user.administrator != None and self.user.administrator:
+            self.__adminCmds()
         self.user = None
+        #FIXME: depopulate admin commands
+    
+    def deleteAccount(self, usrName = None):
+        if usrName == None:
+            usrName = self.user.username
+        self.cli.deleteAccount(usrName)
+        self.logout()
     
     def sessionLoop(self):
         kw = ""

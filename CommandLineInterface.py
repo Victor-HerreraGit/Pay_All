@@ -3,6 +3,7 @@ import pickle
 
 #local imports
 import Session
+from User import User
 
 class CommandLineInterface:
        
@@ -24,7 +25,9 @@ class CommandLineInterface:
     #Admin specific
     kwPromoteAdmin = "promote"
     kwAnnounce = "announce"
-    kwDelInactAcct = kwDelAcct
+    kwUsrList = "listuser"
+    kwOtherUsrSummary = "showuser"
+    #kwDelAcctAdmin = "delacct"
     
     prompt = ">"
     welcomeMsg = "Welcome to Pay All, the Bill centralizer!"
@@ -33,12 +36,12 @@ class CommandLineInterface:
     
     logoutMsg = "Signs-out the current user of the system"
     acctExistsMsg = "username is taken"
-    acctCreateOkMsg = "Account created succesfully"
-    loginOkMsg = "login succesful"
+    acctCreateOkMsg = "Account created successfully"
+    loginOkMsg = "login successful"
     loginBadMsg = "login failed"
     
     homeScreenName = "syshome"
-    adminScreenName = "admin"
+    # adminScreenName = "admin"
     userHomeScreenName = "userhome"
     billViewScreenName = "billview"
     
@@ -52,7 +55,7 @@ class CommandLineInterface:
         return ind
     
     def login(self, userName, password):
-        if userName in self.users:
+        if userName in self.users and password == self.users[userName].password:
             #if self.users[userName].password == password: #FIXME: authenticate
                 return (True, self.users[userName])
         return (False, None)
@@ -62,16 +65,20 @@ class CommandLineInterface:
             return (False, None)
         else:
             #FIXME: call User create acct method
-            usr = None
+            usr = User(userName, password, True, None, None)
             self.users[userName] = usr
             return (True, usr)
-
+            
+    def deleteAccount(self, usrName):
+        self.users.pop(usrName, None)
+    
     def startSession(self, superUser = False): #superUser is root user spawning system
         #create admin user if one doesn't exist
+        
         session = None
         if superUser:
             if CommandLineInterface.rootAcctName not in self.users:
-                suprUsr = None #FIXME with actual user obj
+                suprUsr = User(CommandLineInterface.rootAcctName, "1234", True, None, None) #FIXME with actual user obj
                 self.users[CommandLineInterface.rootAcctName] = suprUsr 
             session = Session.CLISession(self, 0, rootSess = True, user = self.users[CommandLineInterface.rootAcctName]) #FIXME add session ID logic
         else:
