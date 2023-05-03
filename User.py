@@ -5,6 +5,8 @@ class User:
         self.administrator = administrator
         self.payment_method = payment_method
         self.bills = bills
+    def __str__(self):
+        return f"Username: {self.username}, Administrator: {self.administrator},Payment Method: {self.payment_method}, Bill: {self.bills}"
 
     def create_account(self, username, password):
         if username is None or password is None:
