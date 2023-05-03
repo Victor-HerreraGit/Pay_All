@@ -6,6 +6,9 @@ class User:
         self.payment_method = payment_method
         self.bills = bills
 
+    def __str__(self):
+        return f"Username: {self.username}, Administrator: {self.administrator},Payment Method: {self.payment_method}, Bill: {self.bills}"
+
     def create_account(self, username, password):
         if username is None or password is None:
             raise ValueError("Username and password cannot be None.")
@@ -36,7 +39,7 @@ class User:
 
 # Test
 user1 = User('Victor', "verification", False, "Fed Now", 50.0)
-user1.modify_account(None,None,None,None,None)
+user1.modify_account(None, None, None, None, None)
 print(user1.username)
 # print(f" User name: {user1.username},\n Current Password: {user1.password},\n current balance on bill: {user1.bills}")
 # print()
