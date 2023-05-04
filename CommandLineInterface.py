@@ -21,13 +21,17 @@ class CommandLineInterface:
     kwUserSummary = "show"
     kwDelAcct = "deleteacct"
     kwModAcct = "modacct"
+    kwModAcctUsername = "username"
+    kwModAcctPassword = "changepassword"
+    kwAddPaymentMethod = "addpaymentmethod"
+    kwPaymentMethodList = "listpaymentmethod"
+    kwRemovePaymentMethod = "removepaymentmethod"
     
     #Admin specific
     kwPromoteAdmin = "promote"
     kwAnnounce = "announce"
     kwUsrList = "listuser"
     kwOtherUsrSummary = "showuser"
-    #kwDelAcctAdmin = "delacct"
     
     prompt = ">"
     welcomeMsg = "Welcome to Pay All, the Bill centralizer!"
@@ -70,7 +74,12 @@ class CommandLineInterface:
             return (True, usr)
             
     def deleteAccount(self, usrName):
+        self.users[usrName].delete_account()
         self.users.pop(usrName, None)
+    
+    def renameAccount(self, user, oldUsrname):
+        self.users.pop(oldUsrname, None)
+        self.users[user.username] = user
     
     def startSession(self, superUser = False): #superUser is root user spawning system
         #create admin user if one doesn't exist

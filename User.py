@@ -1,10 +1,11 @@
 class User:
-    def __init__(self, username, password, administrator, payment_method, bills):
+    def __init__(self, username, password, administrator, payment_methods, bills):
         self.username = username
         self.password = password
         self.administrator = administrator
-        self.payment_method = payment_method
+        self.payment_methods = payment_methods
         self.bills = bills
+        
     def __str__(self):
         return f"Username: {self.username}, Administrator: {self.administrator},Payment Method: {self.payment_method}, Bill: {self.bills}"
 
@@ -16,15 +17,15 @@ class User:
         self.password = password
         print("Account Created")
 
-    def modify_account(self, username=None, password=None, administrator=None, payment_method=None, bills=None):
+    def modify_account(self, username=None, password=None, administrator=None, payment_methods=None, bills=None):
         if username:
             self.username = username
         if password:
             self.password = password
         if administrator is not None:
             self.administrator = administrator
-        if payment_method:
-            self.payment_method = payment_method
+        if payment_methods:
+            self.payment_methods = payment_methods
         if bills:
             self.bills = bills
 

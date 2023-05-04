@@ -35,7 +35,7 @@ class CLISession:
         self.syn_map[cli.userHomeScreenName] = dict()
         self.syn_map[cli.userHomeScreenName][cli.kwUserSummary] = ["", self.showUser] #FIXME: need User to_string()
         self.syn_map[cli.userHomeScreenName][cli.kwDelAcct] = ["usage '" + cli.kwDelAcct + "' deletes the currently logged in account", self.deleteAccount]
-        #self.syn_map[self.userHomeScreenName][cli.kwModAcct] = 
+        self.syn_map[cli.userHomeScreenName][cli.kwModAcct] = ["Usage 'modacct username value' or 'modacct changepassword value'", self.modAccount]
         
         self.syn_map[cli.billViewScreenName] = dict()
         
@@ -130,6 +130,17 @@ class CLISession:
             usrName = self.user.username
         self.cli.deleteAccount(usrName)
         self.logout()
+        
+    def modAccount(self, keyword, value):
+        if keyword == self.cli.kwModAcctUsername:
+            oldUsrname = self.user.username
+            self.user.modify_account(username = value)
+            self.cli.renameAccount(self.user, oldUsrname)
+        elif keyword == self.cli.kwModAcctPassword:
+            self.user.modify_account(password = value)
+        else:
+            #unrecognized keyword
+            self.display("Unrecognized Account Modification keyword, try ")
     
     def sessionLoop(self):
         kw = ""

@@ -1,17 +1,15 @@
 class PaymentMethod:
-  def __init__(self, name, type, expirationYear, number, securityCode, routingNumber):
+  def __init__(self, name, typ, expirationYear, number, securityCode, routingNumber):
     self.name = name
-    self.type = type
+    self.typ = typ
     self.expiration = expirationYear
     self.number = number
     self.securityCode = securityCode
     self.routingNumber = routingNumber
 
-PaymentMethods = []
-
-def addPaymentMethod(name, type, expirationYear, number, securityCode, routingNumber):
+def addPaymentMethod(user, name, typ, expirationYear, number, securityCode, routingNumber):
     global PaymentMethods
-    if not (type == "Debit" or type == "Credit"):
+    if not (typ == "Debit" or typ == "Credit"):
         print("Invalid Input: Please input either Debit or Credit")
         return
 
@@ -31,19 +29,20 @@ def addPaymentMethod(name, type, expirationYear, number, securityCode, routingNu
         print("Invalid routing number: Please input valid routing number")
         return
 
-    PaymentMethods.append(PaymentMethod(name, type, expirationYear, number, securityCode, routingNumber))
+    user.PaymentMethods.append(PaymentMethod(name, typ, expirationYear, number, securityCode, routingNumber))
     print("Payment method: ", name, " added")
     
 
-def deletePaymentMethod(Payment):
+def deletePaymentMethod(user, Payment):
     if(Payment == None):
         print(Payment, " Invalid")
 
-    PaymentMethods.remove(Payment)
+    user.PaymentMethods.remove(Payment)
     print("Payment method: ", Payment.name, " removed")
-
-print(len(PaymentMethods))
-addPaymentMethod("Hello", "Credit", 2024, "1111111111111111", "868", "000000000")
-print(len(PaymentMethods))
-deletePaymentMethod(PaymentMethods[0])
-print(len(PaymentMethods))
+    
+# if __name__ == "__main__":
+#     print(len(PaymentMethods))
+#     addPaymentMethod("Hello", "Credit", 2024, "1111111111111111", "868", "000000000")
+#     print(len(PaymentMethods))
+#     deletePaymentMethod(PaymentMethods[0])
+#     print(len(PaymentMethods))
