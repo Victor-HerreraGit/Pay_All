@@ -57,8 +57,13 @@ class Bill:
         print(f"Recurring payment set up for billing account: {recurring_payment['billing_account']}, payment method: {recurring_payment['payment_method']}, in the amount of: {recurring_payment['bill_amount']}.")
 
 
-    def linkBillingAccount(self):
-        pass
+    def linkBillingAccount(self, billing_account):
+        if billing_account in self.billing_accounts:
+            print("Error: Billing account is already linked")
+            return
+        
+        self.billing_accounts.append(billing_account)
+        print(f"Billing account {billing_account} linked successfully")
 
     def deleteBillingAccount(self):
         pass
@@ -99,10 +104,32 @@ class Bill:
 
 
     def viewPaymentHistory(self):
-        pass
+        if self.payment_history is None or len(self.payment_history) < 1:
+            print("No payments made yet")
+        else:
+            for payment in self.payment_history:
+                print("Payment History for Billing Account:", payment["billing_account"])
+                print("Payment Date:", payment["payment_date"])
+                print("Payment Method:", payment["payment_method"])
+                print(f"Amount: $", payment["payment_amount"], sep="")
 
 
 # Test
 user = User("Victor", "verification", False, "Fed Now", 50.0)
 bill = Bill(user, 100, "netflix")
 bill.setUpRecurringPayments(100, "netflix", "visa")
+# payment = {
+#             "billing_account": "test",  
+#             "payment_method": "visa",
+#             "payment_amount": 50,
+#             "payment_date": "11:59"
+#         }
+# payment2 = {
+#             "billing_account": "test",  
+#             "payment_method": "visa",
+#             "payment_amount": 50,
+#             "payment_date": "11:59"
+#         }
+# bill.payment_history.append(payment)
+# bill.payment_history.append(payment2)
+# bill.viewPaymentHistory()
