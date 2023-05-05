@@ -1,10 +1,11 @@
 class User:
-    def __init__(self, username, password, administrator, payment_methods = {}, bills = {}):
+    def __init__(self, username, password, administrator, payment_methods = [], bills = []):
         self.username = username
         self.password = password
         self.administrator = administrator
         self.payment_methods = payment_methods
         self.bills = bills
+        self.billing_accounts = []
         
     def __str__(self):
         methods = ""
@@ -23,6 +24,16 @@ class User:
         self.username = username
         self.password = password
         print("Account Created")
+
+    def add_Bill(self, bill):
+        if bill is None:
+            raise ValueError("Bill cannot be None.")
+            return
+        if bill in self.bills:
+            print("Bill already linked to User")
+            return
+        self.bills.append(bill)
+        print("Bill added")
 
     def modify_account(self, username=None, password=None, administrator=None, payment_methods=None, bills=None):
         if username is not None:
