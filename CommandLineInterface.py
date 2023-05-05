@@ -77,9 +77,12 @@ class CommandLineInterface:
         self.users[usrName].delete_account()
         self.users.pop(usrName, None)
     
-    def renameAccount(self, user, oldUsrname):
-        self.users.pop(oldUsrname, None)
-        self.users[user.username] = user
+    def renameAccount(self, user, newusername):
+        if newusername in self.users:
+            return False
+        self.users.pop(user.username, None)
+        self.users[newusername] = user
+        return True
     
     def startSession(self, superUser = False): #superUser is root user spawning system
         #create admin user if one doesn't exist
@@ -87,7 +90,7 @@ class CommandLineInterface:
         session = None
         if superUser:
             if CommandLineInterface.rootAcctName not in self.users:
-                suprUsr = User(CommandLineInterface.rootAcctName, "1234", True, None, None) #FIXME with actual user obj
+                suprUsr = User(CommandLineInterface.rootAcctName, "1234", True)
                 self.users[CommandLineInterface.rootAcctName] = suprUsr 
             session = Session.CLISession(self, 0, rootSess = True, user = self.users[CommandLineInterface.rootAcctName]) #FIXME add session ID logic
         else:
