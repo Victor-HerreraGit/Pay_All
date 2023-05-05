@@ -113,23 +113,23 @@ class Bill:
                 print("Payment Method:", payment["payment_method"])
                 print(f"Amount: $", payment["payment_amount"], sep="")
 
-
-# Test
-user = User("Victor", "verification", False, "Fed Now", 50.0)
-bill = Bill(user, 100, "netflix")
-bill.setUpRecurringPayments(100, "netflix", "visa")
-# payment = {
-#             "billing_account": "test",  
-#             "payment_method": "visa",
-#             "payment_amount": 50,
-#             "payment_date": "11:59"
-#         }
-# payment2 = {
-#             "billing_account": "test",  
-#             "payment_method": "visa",
-#             "payment_amount": 50,
-#             "payment_date": "11:59"
-#         }
-# bill.payment_history.append(payment)
-# bill.payment_history.append(payment2)
-# bill.viewPaymentHistory()
+if __name__ == "__main__":
+    # Test
+    user = User("Victor", "verification", False, "Fed Now", 50.0)
+    bill = Bill(user, 100, "netflix")
+    bill.setUpRecurringPayments(100, "netflix", "visa")
+    # payment = {
+    #             "billing_account": "test",  
+    #             "payment_method": "visa",
+    #             "payment_amount": 50,
+    #             "payment_date": "11:59"
+    #         }
+    # payment2 = {
+    #             "billing_account": "test",  
+    #             "payment_method": "visa",
+    #             "payment_amount": 50,
+    #             "payment_date": "11:59"
+    #         }
+    # bill.payment_history.append(payment)
+    # bill.payment_history.append(payment2)
+    # bill.viewPaymentHistory()

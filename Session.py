@@ -10,6 +10,7 @@ from collections import deque
 import sys
 
 #local imports
+import PaymentMethod
 # from CommandLineInterface import CommandLineInterface
 
 class CLISession:
@@ -35,7 +36,10 @@ class CLISession:
         self.syn_map[cli.userHomeScreenName] = dict()
         self.syn_map[cli.userHomeScreenName][cli.kwUserSummary] = ["", self.showUser] #FIXME: need User to_string()
         self.syn_map[cli.userHomeScreenName][cli.kwDelAcct] = ["usage '" + cli.kwDelAcct + "' deletes the currently logged in account", self.deleteAccount]
-        #self.syn_map[self.userHomeScreenName][cli.kwModAcct] = 
+        self.syn_map[cli.userHomeScreenName][cli.kwModAcct] = ["Usage 'modacct username value' or 'modacct changepassword value'", self.modAccount]
+        self.syn_map[cli.userHomeScreenName][cli.kwAddPaymentMethod] = ["Add payment method with name '" + cli.kwAddPaymentMethod + " method_name', takes you to prompts for input", self.addPaymentMethod]
+        self.syn_map[cli.userHomeScreenName][cli.kwPaymentMethodList] = ["", None]
+        self.syn_map[cli.userHomeScreenName][cli.kwRemovePaymentMethod] = ["", None]
         
         self.syn_map[cli.billViewScreenName] = dict()
         
@@ -74,8 +78,8 @@ class CLISession:
         if add:
             # change delete account behavior to be able to delete any account
             #self.syn_map[self.userHomeScreenName][cli.kwDelAcct]
-            self.syn_map[self.cli.userHomeScreenName][self.cli.kwUsrList] = ["", self.listUsers]
-            self.syn_map[self.cli.userHomeScreenName][self.cli.kwOtherUsrSummary] = ["", self.showUser]
+            self.syn_map[self.cli.userHomeScreenName][self.cli.kwUsrList] = ["list the User accounts of the system", self.listUsers]
+            self.syn_map[self.cli.userHomeScreenName][self.cli.kwOtherUsrSummary] = ["Usage: '" + self.cli.kwOtherUsrSummary + " username' shows the details of the specified user", self.showUser]
         else:
             self.syn_map[self.cli.userHomeScreenName].pop(self.cli.kwUsrList, None)
             self.syn_map[self.cli.userHomeScreenName].pop(self.cli.kwOtherUsrSummary, None)
@@ -86,7 +90,7 @@ class CLISession:
     def showUser(self, usr = None):
         if usr == None:
             usr = self.user.username
-        print(usr + ": " + str(self.cli.users[usr]))
+        print(str(self.cli.users[usr]))
     
     def getSessionID(self):
         return self.__sessionID
@@ -130,6 +134,76 @@ class CLISession:
             usrName = self.user.username
         self.cli.deleteAccount(usrName)
         self.logout()
+        
+    def modAccount(self, keyword, value):
+        if keyword == self.cli.kwModAcctUsername:
+            if self.cli.renameAccount(self.user, value):
+                self.user.modify_account(username = value)
+            else:
+                #username taken
+                self.display(self.cli.acctExistsMsg)
+        elif keyword == self.cli.kwModAcctPassword:
+            self.user.modify_account(password = value)
+        else:
+            #unrecognized keyword
+            self.display("Unrecognized Account Modification keyword, try ")
+
+    def addPaymentMethod(self, method_name):
+        if not PaymentMethod.valName(self.user, method_name):
+            return
+        
+        can = 'cancel'
+        self.display("enter '" + can + "' at any prompt to cancel")
+        
+        typ = self.getUserInput("Enter type (Debit or Credit)")
+        while typ != can and not PaymentMethod.valType(typ):
+            typ = self.getUserInput("Enter type (Debit or Credit)")
+        
+        if typ == can:
+            self.display("Cancelled")
+            return
+        
+        #expiration
+        exp = self.getUserInput("Enter expiration year")
+        while exp != can and not PaymentMethod.valExp(exp):
+            exp = self.getUserInput("Enter expiration year")
+            
+        if exp == can:
+            self.display("Cancelled")
+            return
+            
+        #number
+        num = self.getUserInput("Enter card number (16 digits)")
+        while num != can and not PaymentMethod.valNum(num):
+            num = self.getUserInput("Enter card number")
+        
+        if num == can:
+            self.display("Cancelled")
+            return
+        
+        #sec code
+        cvv = self.getUserInput("Enter card security code (3 digits)")
+        while cvv != can and not PaymentMethod.valSecCode(cvv):
+            cvv = self.getUserInput("Enter card security code")
+        
+        if cvv == can:
+            self.display("Cancelled")
+            return
+        
+        #routing number
+        rout = self.getUserInput("Enter card routing number (9 digits)")
+        while rout != can and not PaymentMethod.valRouteNum(rout):
+            rout = self.getUserInput("Enter card security code")
+        
+        if rout == can:
+            self.display("Cancelled")
+            return
+        
+        PaymentMethod.addPaymentMethod(self.user, method_name, typ, exp, num, cvv, rout)
+        
+    
+    def getUserInput(self, prompt = ""):
+        return input(prompt + self.cli.prompt)
     
     def sessionLoop(self):
         kw = ""

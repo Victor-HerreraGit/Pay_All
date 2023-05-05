@@ -1,12 +1,20 @@
 class User:
-    def __init__(self, username, password, administrator, payment_method, bills):
+    def __init__(self, username, password, administrator, payment_methods = {}, bills = {}):
         self.username = username
         self.password = password
         self.administrator = administrator
-        self.payment_method = payment_method
+        self.payment_methods = payment_methods
         self.bills = bills
+        
     def __str__(self):
-        return f"Username: {self.username}, Administrator: {self.administrator},Payment Method: {self.payment_method}, Bill: {self.bills}"
+        methods = ""
+        for method in self.payment_methods.values():
+            methods = methods + "\n" + str(method)
+            
+        billsStr = ""
+        for bill in self.bills.values():
+            billsStr = billsStr + "\n" + str(bill)
+        return f"Username: {self.username}\nAdministrator: {self.administrator}\nPayment Method: {methods}\nBill: {billsStr}"
 
     def create_account(self, username, password):
         if username is None or password is None:
@@ -16,16 +24,16 @@ class User:
         self.password = password
         print("Account Created")
 
-    def modify_account(self, username=None, password=None, administrator=None, payment_method=None, bills=None):
-        if username:
+    def modify_account(self, username=None, password=None, administrator=None, payment_methods=None, bills=None):
+        if username is not None:
             self.username = username
-        if password:
+        if password is not None:
             self.password = password
         if administrator is not None:
             self.administrator = administrator
-        if payment_method:
-            self.payment_method = payment_method
-        if bills:
+        if payment_methods is not None:
+            self.payment_methods = payment_methods
+        if bills is not None:
             self.bills = bills
 
     def delete_account(self):

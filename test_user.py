@@ -20,9 +20,9 @@ class TestUser(unittest.TestCase):
 
     def test_modify_account(self):
         self.user.modify_account(None,None,None,None,None)
-        self.user.modify_account(administrator=True, payment_method="paypal")
+        self.user.modify_account(administrator=True, payment_methods=["paypal"])
         self.assertTrue(self.user.administrator)
-        self.assertEqual(self.user.payment_method, "paypal")
+        self.assertEqual(self.user.payment_methods[0], "paypal")
 
     def test_delete_account(self):
         self.user.delete_account()
