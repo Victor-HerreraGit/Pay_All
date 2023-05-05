@@ -12,6 +12,9 @@ class Bill:
         self.frequency = 30 
         # 30 days for recurring payments
 
+    def __str__(self):
+        return f"Bill for {self.user.username} using {self.payment_method.type}:\nAmount: {self.amount}\nBilling Accounts: {self.billing_accounts}\nPayment History: {self.payment_history}\nRecurring Payments: {self.recurring_payments}"
+
     def view_bills(self):
         pass
 
