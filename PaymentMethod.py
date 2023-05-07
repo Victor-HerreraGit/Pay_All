@@ -61,8 +61,8 @@ def deletePaymentMethod(user, Payment):
     if(Payment == None):
         print(Payment, " Invalid")
 
-    user.payment_methods.remove(Payment)
-    print("Payment method: ", Payment.name, " removed")
+    user.payment_methods.pop(Payment, None)
+    print("Payment method: ", Payment, " removed")
     
 # if __name__ == "__main__":
 #     print(len(PaymentMethods))

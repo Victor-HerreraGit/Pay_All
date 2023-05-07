@@ -23,9 +23,24 @@ class CommandLineInterface:
     kwModAcct = "modacct"
     kwModAcctUsername = "username"
     kwModAcctPassword = "changepassword"
-    kwAddPaymentMethod = "addpaymentmethod"
-    kwPaymentMethodList = "listpaymentmethod"
-    kwRemovePaymentMethod = "removepaymentmethod"
+    
+    kwAddPaymentMethod = "addpaymethod"
+    kwPaymentMethodList = "listpaymethod"
+    kwRemovePaymentMethod = "rmpaymethod"
+    
+    kwAddBillingAccount = "addbillacct"
+    kwNavBillingAccount = "showbillacct"
+    kwRmBillingAccount = "rmbillacct"
+    kwListBillingAccount = "listbillacct"
+    
+    #For both userhome and specific to a billing account
+    kwShowUnpaidBills = "showbills"
+    kwShowAllBills = "showallbills"
+    kwQueryNewBills = "syncbills"
+    kwPayBill = "paybill"
+    
+    #BillingAcct view specific
+    kwNavHome = "userhome" #exits the view of a specific billing acct
     
     #Admin specific
     kwPromoteAdmin = "promote"
@@ -45,9 +60,8 @@ class CommandLineInterface:
     loginBadMsg = "login failed"
     
     homeScreenName = "syshome"
-    # adminScreenName = "admin"
     userHomeScreenName = "userhome"
-    billViewScreenName = "billview"
+    billAcctViewScreenName = "billingacct"
     
     def __init__(self, users):
         self.sessions = [] #start with empty session list
@@ -111,9 +125,9 @@ if __name__ == "__main__":
             users = pickle.load(f)
             f.close()
         cmd = CommandLineInterface(users)
-        try:
-            cmd.startSession(superUser=True) #FIXME: migrate to manager framework, requiring separate login
-        finally:
-            f = open(userFileName, 'wb')
-            pickle.dump(cmd.users, f)
-            f.close()
+        # try:
+        cmd.startSession(superUser=True) #FIXME: migrate to manager framework, requiring separate login
+        # finally:
+        f = open(userFileName, 'wb')
+        pickle.dump(cmd.users, f)
+        f.close()

@@ -19,7 +19,7 @@ class TestUser(unittest.TestCase):
             self.user.create_account('username', None)
 
     def test_modify_account(self):
-        self.user.modify_account(None,None,None,None,None)
+        self.user.modify_account(None,None,None,None)
         self.user.modify_account(administrator=True, payment_methods=["paypal"])
         self.assertTrue(self.user.administrator)
         self.assertEqual(self.user.payment_methods[0], "paypal")
@@ -29,8 +29,8 @@ class TestUser(unittest.TestCase):
         self.assertIsNone(self.user.username)
         self.assertIsNone(self.user.password)
         self.assertIsNone(self.user.administrator)
-        self.assertIsNone(self.user.payment_method)
-        self.assertIsNone(self.user.bills)
+        self.assertIsNone(self.user.payment_methods)
+        self.assertIsNone(self.user.billing_accounts)
 
 
 if __name__ == '__main__':

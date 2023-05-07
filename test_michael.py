@@ -171,7 +171,7 @@ class MichaelUnitTests(TestCase):
             cli.startSession(superUser=True)
             
         # print(mock_method.call_args_list)
-        self.assertEqual(mock_method.call_count, 4, "CLISession.display called 4 times")
+        self.assertEqual(mock_method.call_count, 5, "CLISession.display called 4 times")
         mock_method.assert_called_with(CommandLineInterface.kwExit)
         
 if __name__ == "__main__":
