@@ -21,13 +21,32 @@ class CommandLineInterface:
     kwUserSummary = "show"
     kwDelAcct = "deleteacct"
     kwModAcct = "modacct"
+    kwModAcctUsername = "username"
+    kwModAcctPassword = "changepassword"
+    
+    kwAddPaymentMethod = "addpaymethod"
+    kwPaymentMethodList = "listpaymethod"
+    kwRemovePaymentMethod = "rmpaymethod"
+    
+    kwAddBillingAccount = "addbillacct"
+    kwNavBillingAccount = "showbillacct"
+    kwRmBillingAccount = "rmbillacct"
+    kwListBillingAccount = "listbillacct"
+    
+    #For both userhome and specific to a billing account
+    kwShowUnpaidBills = "showbills"
+    kwShowAllBills = "showallbills"
+    kwQueryNewBills = "syncbills"
+    kwPayBill = "paybill"
+    
+    #BillingAcct view specific
+    kwNavHome = "userhome" #exits the view of a specific billing acct
     
     #Admin specific
     kwPromoteAdmin = "promote"
     kwAnnounce = "announce"
     kwUsrList = "listuser"
     kwOtherUsrSummary = "showuser"
-    #kwDelAcctAdmin = "delacct"
     
     prompt = ">"
     welcomeMsg = "Welcome to Pay All, the Bill centralizer!"
@@ -41,9 +60,8 @@ class CommandLineInterface:
     loginBadMsg = "login failed"
     
     homeScreenName = "syshome"
-    # adminScreenName = "admin"
     userHomeScreenName = "userhome"
-    billViewScreenName = "billview"
+    billAcctViewScreenName = "billingacct"
     
     def __init__(self, users):
         self.sessions = [] #start with empty session list
@@ -70,7 +88,15 @@ class CommandLineInterface:
             return (True, usr)
             
     def deleteAccount(self, usrName):
+        self.users[usrName].delete_account()
         self.users.pop(usrName, None)
+    
+    def renameAccount(self, user, newusername):
+        if newusername in self.users:
+            return False
+        self.users.pop(user.username, None)
+        self.users[newusername] = user
+        return True
     
     def startSession(self, superUser = False): #superUser is root user spawning system
         #create admin user if one doesn't exist
@@ -78,7 +104,7 @@ class CommandLineInterface:
         session = None
         if superUser:
             if CommandLineInterface.rootAcctName not in self.users:
-                suprUsr = User(CommandLineInterface.rootAcctName, "1234", True, None, None) #FIXME with actual user obj
+                suprUsr = User(CommandLineInterface.rootAcctName, "1234", True)
                 self.users[CommandLineInterface.rootAcctName] = suprUsr 
             session = Session.CLISession(self, 0, rootSess = True, user = self.users[CommandLineInterface.rootAcctName]) #FIXME add session ID logic
         else:
@@ -99,9 +125,9 @@ if __name__ == "__main__":
             users = pickle.load(f)
             f.close()
         cmd = CommandLineInterface(users)
-        try:
-            cmd.startSession(superUser=True) #FIXME: migrate to manager framework, requiring separate login
-        finally:
-            f = open(userFileName, 'wb')
-            pickle.dump(cmd.users, f)
-            f.close()
+        # try:
+        cmd.startSession(superUser=True) #FIXME: migrate to manager framework, requiring separate login
+        # finally:
+        f = open(userFileName, 'wb')
+        pickle.dump(cmd.users, f)
+        f.close()
